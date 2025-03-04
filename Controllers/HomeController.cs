@@ -1,3 +1,4 @@
+using ASC.Utilities;
 using ASC.Web.Configuration;
 using ASC.Web.Models;
 using ASC.Web.Services;
@@ -12,19 +13,20 @@ namespace ASC.Web.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        private IOptions<ApplicationSettings> _settings;
-        public HomeController(ILogger<HomeController> logger, IOptions<ApplicationSettings> settings)
+		private IOptions<ApplicationSettings> _settings;
+        public HomeController(IOptions<ApplicationSettings> settings)
         {
            // _logger = logger;
             _settings = settings;
         }
 
-        public IActionResult Index([FromServices] IEmailSender emailSender)
+        public IActionResult Index()
         {
-            ViewBag.Title = _settings.Value.ApplicationTitle;
-            var emailService = this.HttpContext.RequestServices.GetService(typeof(IEmailSender)) as IEmailSender;
-            return View();
-        }
+			HttpContext.Session.SetSession("Test", _settings.Value);
+			var settings = HttpContext.Session.GetSession<ApplicationSettings>("Test");
+			ViewBag.Title = settings.ApplicationTitle;
+			return View();
+		}
 
         public IActionResult Privacy()
         {
