@@ -32,7 +32,7 @@ namespace ASC.Web.Data
 
             // Create admin if he doesn't exitst
             var admin = await userManager.FindByEmailAsync(options.Value.AdminEmail);
-            if (admin != null)
+            if (admin == null)
             {
                 IdentityUser user = new IdentityUser
                 {
@@ -41,13 +41,14 @@ namespace ASC.Web.Data
                     EmailConfirmed = true,
                 };
                 IdentityResult result = await userManager.CreateAsync(user,options.Value.AdminPassword);
-                await userManager.AddClaimAsync(user, new System.Security.Claims.Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", options.Value.AdminEmail));
-                await userManager.AddClaimAsync(user, new System.Security.Claims.Claim("IsActive","True"));
+               
                 //Add Admin to Adminroles
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(user, Roles.Admin.ToString());
-                }
+					await userManager.AddClaimAsync(user, new System.Security.Claims.Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", options.Value.AdminEmail));
+					await userManager.AddClaimAsync(user, new System.Security.Claims.Claim("IsActive", "True"));
+				}
             }
 
             var engineer = await userManager.FindByEmailAsync(options.Value.EngineerEmail);
@@ -55,17 +56,18 @@ namespace ASC.Web.Data
             {
                 IdentityUser user = new IdentityUser
                 {
-                    UserName = options.Value.AdminName,
-                    Email = options.Value.AdminEmail,
+                    UserName = options.Value.EngineerName,
+                    Email = options.Value.EngineerEmail,
                     EmailConfirmed = true,
                     LockoutEnabled = false,
                 };
                 IdentityResult result = await userManager.CreateAsync(user, options.Value.EngineerPassword);
-                await userManager.AddClaimAsync(user, new System.Security.Claims.Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", options.Value.EngineerEmail));
-                await userManager.AddClaimAsync(user, new System.Security.Claims.Claim("IsActive", "True"));
+                
                 if (result.Succeeded)
                 {
 					await userManager.AddToRoleAsync(user, Roles.Engineer.ToString());
+					await userManager.AddClaimAsync(user, new System.Security.Claims.Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", options.Value.EngineerEmail));
+					await userManager.AddClaimAsync(user, new System.Security.Claims.Claim("IsActive", "True"));
 				}
             }
         }

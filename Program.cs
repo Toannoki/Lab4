@@ -1,4 +1,4 @@
-﻿using ASC.Web.Data;
+using ASC.Web.Data;
 using ASC.Web.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +16,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 	options.UseSqlServer(connectionString));
+
+/*builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();*/
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // ✅ Đăng ký Identity chỉ một lần và cấu hình bên trong luôn

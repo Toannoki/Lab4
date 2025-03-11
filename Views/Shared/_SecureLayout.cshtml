@@ -1,4 +1,4 @@
-﻿﻿@{
+﻿@{
     Layout = "_MasterLayout";
 }
 
@@ -17,7 +17,7 @@
         <li>
             <div class="user-view">
                 <div class="background blue-grey lighten-1"></div>
-                <a href="#!user"><img class="circle" src="~/images/avata.jpg"></a>
+                <a href="#!user"><img class="circle" src="~/images/avatar.jpg"></a>
                 <a href="#!name"><span class="white-text name">John Doe</span></a>
                 <a href="#!email"><span class="white-text email">jdandturk@gmail.com</span></a>
             </div>
@@ -75,11 +75,14 @@
             </a>
         </li>
         <li>
-            <a class="collapsible-header" href="#!">
+            <a class="collapsible-header" href="#!" id="ancrLogout">
                 <i class="material-icons">exit_to_app</i>
                 Logout
             </a>
         </li>
+        <form class="hide" method="post" id="logout_form" asp-area="Identity" asp-page="/Account/Logout">
+            <input type="submit" value="Logout" />
+        </form>
     </ul>
 </header>
 
@@ -133,3 +136,22 @@
         </div>
     </div>
 </footer>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+
+    <script type="text/javascript">
+        $(function () {
+            $('#ancrLogout').click(function () {
+                $('#logout_form').submit();
+            });
+        });
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.collapsible').collapsible();
+        });
+    </script>
+}
+
