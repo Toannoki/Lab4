@@ -307,3 +307,7 @@ D:\VSStu\Project\ASC.Solution\ASC.Web\bin\Debug\net8.0\runtimes\win-arm\native\e
 D:\VSStu\Project\ASC.Solution\ASC.Web\bin\Debug\net8.0\runtimes\win-arm64\native\e_sqlite3.dll
 D:\VSStu\Project\ASC.Solution\ASC.Web\bin\Debug\net8.0\runtimes\win-x64\native\e_sqlite3.dll
 D:\VSStu\Project\ASC.Solution\ASC.Web\bin\Debug\net8.0\runtimes\win-x86\native\e_sqlite3.dll
+D:\VSStu\Project\ASC.Solution\ASC.Web\bin\Debug\net8.0\Navigation\Navigation.json
+D:\VSStu\Project\ASC.Solution\ASC.Web\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
+D:\VSStu\Project\ASC.Solution\ASC.Web\bin\Debug\net8.0\MailKit.dll
+D:\VSStu\Project\ASC.Solution\ASC.Web\bin\Debug\net8.0\MimeKit.dll

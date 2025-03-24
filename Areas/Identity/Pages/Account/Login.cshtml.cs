@@ -79,63 +79,65 @@ namespace ASC.Web.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync(string returnUrl = null)
         {
-            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+			if (!String.IsNullOrWhiteSpace(ErrorMessage))
+			{
+				ModelState.AddModelError(string.Empty, ErrorMessage);
+			}
+			returnUrl ??= Url.Content("~/");
 
-            ReturnUrl = returnUrl;
-        }
+			// Clear the existing external cookie to ensure a clean login process
+			await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+
+			ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+			ReturnUrl = returnUrl;
+		}
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            // returnUrl = returnUrl ?? Url.Content("~/");
+			if (ModelState.IsValid)
+			{
+				var user = await _userManager.FindByEmailAsync(Input.Email);
+				if (user == null)
+				{
+					ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+					return Page();
+				}
 
-            if (ModelState.IsValid)
-            {
-                var user = await _userManager.FindByEmailAsync(Input.Email);
-                if (user == null)
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return Page();
-                }
+				var list = await _userManager.GetClaimsAsync(user);
+				var isActive = Boolean.Parse(list.SingleOrDefault(p => p.Type == "IsActive").Value);
+				if (!isActive)
+				{
+					ModelState.AddModelError(string.Empty, "Account has been locked.");
+					return Page();
+				}
 
-                var list = await _userManager.GetClaimsAsync(user);
-                var isActive = Boolean.Parse(list.SingleOrDefault(p => p.Type == "IsActive").Value);
-                if (!isActive)
-                {
-                    ModelState.AddModelError(string.Empty, "Account has been locked.");
-                    return Page();
-                }
+				var result = await _signInManager.PasswordSignInAsync(user.UserName, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+				if (result.Succeeded)
+				{
+					_logger.LogInformation(1, "User logged in.");
+					if (!String.IsNullOrWhiteSpace(returnUrl))
+						return RedirectToAction(returnUrl);
+					else
+						return RedirectToAction("Dashboard", "Dashboard", new { Area = "ServiceRequests" });
+				}
 
-                var result = await _signInManager.PasswordSignInAsync(
-                    user.UserName, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+				if (result.RequiresTwoFactor)
+				{
+					return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+				}
 
-                if (result.Succeeded)
-                {
-                    _logger.LogInformation(1, "User logged in.");
-                    if (!String.IsNullOrWhiteSpace(returnUrl))
-                        return RedirectToAction(returnUrl);
-                    else
-                        return RedirectToAction("Dashboard", "Dashboard");
-                }
-
-                if (result.RequiresTwoFactor)
-                {
-                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
-                }
-
-                if (result.IsLockedOut)
-                {
-                    _logger.LogWarning("User account locked out.");
-                    return RedirectToPage("./Lockout");
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return Page();
-                }
-            }
-
-            // If we got this far, something failed, redisplay form
-            return Page();
-        }
+				if (result.IsLockedOut)
+				{
+					_logger.LogWarning("User account locked out.");
+					return RedirectToPage("./Lockout");
+				}
+				else
+				{
+					ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+					return Page();
+				}
+			}
+			return Page();
+		}
     }
 }
