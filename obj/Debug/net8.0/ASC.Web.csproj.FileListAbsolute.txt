@@ -311,3 +311,4 @@ D:\VSStu\Project\ASC.Solution\ASC.Web\bin\Debug\net8.0\Navigation\Navigation.jso
 D:\VSStu\Project\ASC.Solution\ASC.Web\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
 D:\VSStu\Project\ASC.Solution\ASC.Web\bin\Debug\net8.0\MailKit.dll
 D:\VSStu\Project\ASC.Solution\ASC.Web\bin\Debug\net8.0\MimeKit.dll
+D:\VSStu\Project\ASC.Solution\ASC.Web\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.Google.dll
