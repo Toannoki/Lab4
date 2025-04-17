@@ -1,7 +1,6 @@
 ﻿using ASC.Model.BaseTypes;
 using ASC.Utilities;
 using ASC.Web.Areas.Accounts.Models;
-using ASC.Web.Areas.Accounts.Models;
 using ASC.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -150,8 +149,9 @@ namespace ASC.Web.Areas.Accounts.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Customers(CustomerViewModel customer)
         {
-            ModelState.Remove("Customers");
+            ModelState.Remove("Registration.UserName");
             customer.Customers = HttpContext.Session.GetSession<List<IdentityUser>>("Customers");
+
             if (!ModelState.IsValid)
             {
                 return View(customer);
@@ -164,7 +164,8 @@ namespace ASC.Web.Areas.Accounts.Controllers
                 var user = await _userManager.FindByEmailAsync(customer.Registration.Email);
                 var identity = await _userManager.GetClaimsAsync(user);
                 var isActiveClaim = identity.SingleOrDefault(p => p.Type == "IsActive");
-                var removeClaimResult = await _userManager.RemoveClaimsAsync(user, new[] { new System.Security.Claims.Claim(isActiveClaim.Type, isActiveClaim.Value) });
+
+                var removeClaimResult = await _userManager.RemoveClaimAsync(user, new System.Security.Claims.Claim(isActiveClaim.Type, isActiveClaim.Value));
                 var addClaimResult = await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim(isActiveClaim.Type, customer.Registration.IsActive.ToString()));
 
                 if (customer.Registration.IsActive)
@@ -178,6 +179,36 @@ namespace ASC.Web.Areas.Accounts.Controllers
             }
 
             return RedirectToAction("Customers");
+        }
+
+        [HttpGet]
+        public IActionResult Profile()
+        {
+            var user = HttpContext.User.GetCurrentUserDetails();
+            return View(new ProfileModel() { UserName = user.Name });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Profile(ProfileModel profile)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
+            var user = await _userManager.FindByEmailAsync(HttpContext.User.GetCurrentUserDetails().Email);
+            user.UserName = profile.UserName;
+
+            IdentityResult result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                result.Errors.ToList().ForEach(p => ModelState.AddModelError("", p.Description));
+                return View();
+            }
+
+            await _signInManager.RefreshSignInAsync(user);
+            return RedirectToAction("Dashboard", "Dashboard", new { area = "ServiceRequests" });
         }
 
     }

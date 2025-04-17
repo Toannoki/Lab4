@@ -1,7 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using System.Security.Claims
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-
 @model ASC.Web.Areas.Accounts.Models.CustomerViewModel
 
 @inject UserManager<IdentityUser> userManager
@@ -78,14 +77,14 @@
                     <h5>User Details</h5>
                 </div>
                 <div class="divider"></div>
-                <form asp-controller="Account" asp-action="Customers" method="post" class="col s12" id="fromUser">
+                <form asp-controller="Account" asp-action="Customers" method="post" class="col s12" id="formUser">
                     <input type="hidden" asp-for="Registration.IsEdit" />
                     <input type="hidden" asp-for="Registration.Email" />
                     <div class="input-field col s4">
-                        <input asp-for="Registration.Email" id="Input_Registration_Email" placeholder="Email" />
-                        <label asp-for="Registration.Email"></label>
+                        <input autocomplete="off" asp-for="Registration.Email" id="Input_Registration_Email" placeholder="Email" readonly />
+                        @* <label asp-for="Registration.Email"></label> *@
                     </div>
- 
+
                     <div class="input-field col s4">
                         <div class="switch">
                             <label>
@@ -96,7 +95,7 @@
                         </div>
                     </div>
                     <div class="input-field col s4 right-align">
-                        <button class="btn waves-effect waves-light btnSubmit" type="submit" name="action">
+                        <button class="btn waves-effect waves-light" id="btnSubmit" type="submit" name="action">
                             Save
                             <i class="material-icons right">send</i>
                         </button>
@@ -133,7 +132,7 @@
 
             // Handle Reset functionality
             $(document).on('click', '.reset', function () {
-                $('#fromUser')[0].reset();
+                $('#formUser')[0].reset();
                 $('#Input_Registration_Email').removeAttr('disabled');
                 $('#Registration_IsEdit').val('False');
                 $('#btnSubmit').attr('disabled', 'disabled');
